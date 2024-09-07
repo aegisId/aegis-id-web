@@ -1,7 +1,6 @@
 import SocialButtons from '../components/SocialButtons';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import logo from '../assets/agies.png';
 
 export default function Home() {
