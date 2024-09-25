@@ -1,35 +1,58 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
-import { TWITTER_CLIENT_ID, TWITTER_REDIRECT_URI } from '../config/authConfig';
 
 export const useTwitterAuth = () => {
   const [userId, setUserId] = useState<string | null>(null);
+  const backendHost = "https://www.aegisid.io";
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    if (code) {
-      handleTwitterCallback(code);
-    }
-  }, []);
-
-  const handleAuth = () => {
-    const twitterAuthUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${TWITTER_CLIENT_ID}&redirect_uri=${TWITTER_REDIRECT_URI}&scope=tweet.read%20users.read&state=state&code_challenge=challenge&code_challenge_method=plain`;
-    window.location.href = twitterAuthUrl;
+  const missionEndpoints = {
+    twitterAuthlink: "/twitter/authlink",
+  }
+  const defaultCreds = {
+    oauthToken: "",
+    oauthVerifier: "",
   };
+  const [twitterCreds, setTwitterCreds] = useState(defaultCreds);
+  console.log("🚀 ~ useTwitterAuth ~ twitterCreds:", twitterCreds)
 
-  const handleTwitterCallback = async (code: string) => {
-    try {
-      const response = await axios.post('/api/auth/twitter', { code });
-      setUserId(response.data.userId);
-    } catch (error) {
-      console.error('Error during Twitter authentication:', error);
+
+  const handleAuth = async () => {
+    setTwitterCreds(defaultCreds); // Reset tokens on every auth attempt
+    const authlinkEndpoint: URL = new URL(
+      missionEndpoints.twitterAuthlink,
+      backendHost
+    );
+    const api = axios.create({
+    baseURL: "https://www.aegisid.io",
+    withCredentials: true,
+  });
+
+    const response = await api.post(authlinkEndpoint.href).catch((err) => {});
+    if (response?.status === 200) {
+      const oauth_token =
+        new URL(response.data.authlink).searchParams.get("oauth_token") || "";
+      setTwitterCreds((prevCreds) => ({
+        ...prevCreds,
+        oauth_token,
+      }));
+      const twitterPopup = window.open(
+        response.data.authlink,
+        "twitterPopup",
+        "width=500"
+      );
+      window.onmessage = (ev) => {
+        if (ev.data.eventType === "twitter oauth") {
+          setTwitterCreds({
+            oauthToken: ev.data.oauth_token,
+            oauthVerifier: ev.data.oauth_verifier,
+          });
+          twitterPopup?.close();
+        }
+      };
     }
   };
-
   const disconnect = () => {
     setUserId(null);
-    // Add any additional cleanup or API calls needed for disconnection
   };
 
   return { userId, handleAuth, disconnect };
