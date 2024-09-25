@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const useTwitterAuth = () => {
   const [userId, setUserId] = useState<string | null>(null);
-  const backendHost = "https://www.aegisid.io";
+  const backendHost = "https://api.aegisid.io";
 
   const missionEndpoints = {
     twitterAuthlink: "/twitter/authlink",
@@ -23,7 +23,7 @@ export const useTwitterAuth = () => {
       backendHost
     );
     const api = axios.create({
-    baseURL: "https://www.aegisid.io",
+    baseURL: "https://api.aegisid.io",
     withCredentials: true,
   });
 
