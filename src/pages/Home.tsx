@@ -5,15 +5,13 @@ import {
   Container,
   Grid,
   Link,
+  Skeleton,
   styled,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import WhatshotIcon from "@mui/icons-material/Whatshot";
-
-// Import assets
 import logo from "../assets/logo.svg";
 import logo_light from "../assets/logo_light.svg";
 import twitter from "../assets/twitter.svg";
@@ -24,8 +22,12 @@ import {
   WalletInfo,
 } from "@aptos-labs/wallet-adapter-react";
 import { useTwitterAuth } from "../hooks/useTwitterAuth";
+import {
+  getAccountAge,
+  getProtocolsInteracted,
+  getTotalNumberOfTransaction,
+} from "../utils/helper";
 
-// Styled components
 const CustomButton = styled(Button)(({ theme }) => ({
   backgroundColor: "#3a1e09",
   color: theme.palette.common.white,
@@ -164,9 +166,11 @@ const ProfileSection = () => {
   );
 };
 
-const ActionButtons: React.FC<{ onActionClick: (action: string) => void }> = ({
-  onActionClick,
-}) => {
+interface ActionButtonsProps {
+  onActionClick: (action: string) => void;
+}
+
+const ActionButtons: React.FC<ActionButtonsProps> = ({ onActionClick }) => {
   const actions: string[] = [
     "Social Media",
     "Biometrics and Liveliness",
@@ -174,19 +178,26 @@ const ActionButtons: React.FC<{ onActionClick: (action: string) => void }> = ({
     "On-chain activity",
   ];
 
+  const [selectedAction, setSelectedAction] = useState<string>(actions[0]); 
+
+  const handleActionClick = (action: string) => {
+    setSelectedAction(action); 
+    onActionClick(action);
+  };
+
   return (
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-      {actions.map((action, index) => (
+      {actions.map((action) => (
         <Button
           key={action}
-          variant={index === 0 ? "contained" : "outlined"}
+          variant={selectedAction === action ? "contained" : "outlined"} 
           sx={{
-            bgcolor: index === 0 ? "#3a1e09" : "transparent",
+            bgcolor: selectedAction === action ? "#3a1e09" : "transparent",
             borderColor: "#3a1e09",
-            color: index === 0 ? "white" : "#3a1e09",
+            color: selectedAction === action ? "white" : "#3a1e09",
             flex: { xs: "1 0 40%", sm: "1 0 auto" },
           }}
-          onClick={() => onActionClick(action)} // Handle button click
+          onClick={() => handleActionClick(action)}
         >
           {action}
         </Button>
@@ -452,13 +463,33 @@ const Header: React.FC<HeaderProps> = ({
     </Box>
   );
 };
-const OnChain = (): JSX.Element => {
+
+interface OnChainProps {
+  transactions: number | null; 
+  age: Date | null; 
+  totalGas: number | null;
+  loading: boolean; 
+}
+
+const OnChain = ({
+  transactions,
+  age,
+  totalGas,
+  loading, 
+}: OnChainProps): JSX.Element => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const calculateAgeInDays = (startDate: Date): number => {
+    const today = new Date();
+    const timeDifference = today.getTime() - startDate.getTime();
+    const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
+    return daysDifference;
+  };
+
   return (
     <Grid container spacing={1} alignItems="center">
-      {["Total Contributions", "Current Streak", "Longest Streak"].map(
+      {["Account Age", "Total Transactions", "Total Gas"].map(
         (title, index) => (
           <Grid item xs={12} sm={4} key={title}>
             <Box textAlign="center" mb={isMobile ? 2 : 0}>
@@ -467,7 +498,7 @@ const OnChain = (): JSX.Element => {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  p: 1, // Reduced padding to ensure consistent box size
+                  p: 1,
                   height: "100%",
                   borderLeft:
                     index === 1
@@ -479,12 +510,13 @@ const OnChain = (): JSX.Element => {
                       : "none",
                 }}
               >
+                {/* Display Skeleton while loading */}
                 {index === 1 ? (
                   <Box
                     sx={{
                       position: "relative",
-                      width: { xs: 90, sm: 100 }, // Slightly reduced width
-                      height: { xs: 90, sm: 100 }, // Slightly reduced height
+                      width: { xs: 90, sm: 100 },
+                      height: { xs: 90, sm: 100 },
                       margin: "auto",
                       borderRadius: "50%",
                       border: "4px solid #3a1e09",
@@ -493,42 +525,70 @@ const OnChain = (): JSX.Element => {
                       justifyContent: "center",
                     }}
                   >
-                    <WhatshotIcon
-                      sx={{
-                        position: "absolute",
-                        top: -18,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        fontSize: { xs: 28, sm: 36 }, // Reduced icon size
-                        color: "#3a1e09",
-                      }}
-                    />
-                    <Typography
-                      variant={isMobile ? "h5" : "h4"} // Reduced typography size
-                      sx={{
-                        color: "#3a1e09",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      9
-                    </Typography>
+                    {loading ? (
+                      <Skeleton
+                        variant="circular"
+                        width={isMobile ? 90 : 100}
+                        height={isMobile ? 90 : 100}
+                      />
+                    ) : (
+                      <Typography
+                        variant={isMobile ? "h5" : "h4"}
+                        sx={{
+                          color: "#3a1e09",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {transactions
+                          ? transactions.toLocaleString()
+                          : "0"}
+                      </Typography>
+                    )}
                   </Box>
                 ) : (
+                  loading ? (
+                    <Skeleton
+                      variant="text"
+                      width={isMobile ? 80 : 120}
+                      height={isMobile ? 40 : 60}
+                    />
+                  ) : (
+                    <Typography
+                      variant={isMobile ? "h5" : "h4"}
+                      color="#3a1e09"
+                      fontWeight="bold"
+                    >
+                      {index === 0
+                        ? age
+                          ? `${calculateAgeInDays(age)} Days`
+                          : "0"
+                        : totalGas
+                        ? totalGas
+                        : "0"}
+                    </Typography>
+                  )
+                )}
+                
+                {index === 2 && totalGas && (
                   <Typography
-                    variant={isMobile ? "h5" : "h4"} // Reduced typography size
+                    variant={isMobile ? "h5" : "h6"}
                     color="#3a1e09"
                     fontWeight="bold"
                   >
-                    {index === 0 ? "2,484" : "39"}
+                    APT
                   </Typography>
                 )}
+
                 <Typography variant="subtitle1" color="#3a1e09" mt={1}>
                   {title}
                 </Typography>
+
                 <Typography variant="body2" color="#3a1e09" mt={0.5}>
-                  {index === 0 && "Sep 29, 2020 - Present"}
-                  {index === 1 && "Sep 16 - Sep 24"}
-                  {index === 2 && "Feb 6, 2023 - Mar 16, 2023"}
+                  {index === 1 && age && !loading
+                    ? `${age.toLocaleString("default", {
+                        month: "short",
+                      })} ${age.getFullYear()} - Present`
+                    : ""}
                 </Typography>
               </Box>
             </Box>
@@ -538,14 +598,143 @@ const OnChain = (): JSX.Element => {
     </Grid>
   );
 };
+interface ChainDataProps {
+  protocols: {
+    kanalabs: number;
+    hippo: number;
+  } | null;
+  totalGas: number | null;
+  transactions: number | null;
+  age: Date | null;
+  isloading: boolean;
+}
+
+const ChainData = ({
+  protocols,
+  totalGas,
+  transactions,
+  age,
+  isloading,
+}: ChainDataProps): JSX.Element => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  return (
+    <Grid container spacing={1} alignItems="center">
+      {[
+        {
+          title: "Protocols",
+          value: isloading ? (
+            <Skeleton variant="text" width={isMobile ? 100 : 150} />
+          ) : protocols ? `${protocols.kanalabs ?? 0} (Kanalabs), ${
+              protocols.hippo ?? 0
+            } (Hippo)` : "N/A",
+        },
+        {
+          title: "Total Gas",
+          value: isloading ? (
+            <Skeleton variant="text" width={isMobile ? 50 : 100} />
+          ) : totalGas ? `${totalGas} APT` : "N/A",
+        },
+        {
+          title: "Transactions",
+          value: isloading ? (
+            <Skeleton variant="text" width={isMobile ? 50 : 100} />
+          ) : transactions ? `${transactions}` : "N/A",
+        },
+        {
+          title: "Account Age",
+          value: isloading ? (
+            <Skeleton variant="text" width={isMobile ? 100 : 150} />
+          ) : age ? age.toDateString() : "N/A",
+        },
+      ].map((item, index) => (
+        <Grid item xs={12} sm={6} key={item.title}>
+          <Box textAlign="center" mb={isMobile ? 2 : 0}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                p: 1,
+                height: "100%",
+                borderLeft:
+                  index === 1
+                    ? { xs: "none", sm: "1.5px solid #3a1e091a" }
+                    : "none",
+                borderRight:
+                  index === 1
+                    ? { xs: "none", sm: "1.5px solid #3a1e091a" }
+                    : "none",
+              }}
+            >
+              <Typography
+                variant={isMobile ? "h5" : "h4"}
+                color="#3a1e09"
+                fontWeight="bold"
+              >
+                {item.value}
+              </Typography>
+              <Typography variant="subtitle1" color="#3a1e09" mt={1}>
+                {item.title}
+              </Typography>
+            </Box>
+          </Box>
+        </Grid>
+      ))}
+    </Grid>
+  );
+};
 
 const Home: React.FC = () => {
   const { connected, wallet, account } = useWallet();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAction, setSelectedAction] = useState<string | null>(
     "Social Media"
-  ); // State to track the selected action
+  );
+  type ProtocolsInteractedResponse = {
+    protocal: {
+      kanalabs: number;
+      hippo: number;
+    };
+    totalGas: number;
+  };
 
+  const [accountAge, setAccountAge] = useState<Date>();
+  const [totalTransactions, setTotalTransactions] = useState<string>();
+  const [protocolsInteracted, setProtocolsInteracted] =
+    useState<ProtocolsInteractedResponse>();
+    const [loading, setLoading] = useState(false); 
+
+  useEffect(() => {
+    if (connected) {
+      const fetchData = async () => {
+        setLoading(true); 
+        try {
+          const [age, transactions, protocols] = await Promise.all([
+            getAccountAge(account?.address!),
+            getTotalNumberOfTransaction(account?.address!),
+            getProtocolsInteracted(account?.address!),
+          ]);
+
+          setAccountAge(age!);
+          setTotalTransactions(transactions);
+          setProtocolsInteracted(protocols!);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }finally {
+          setLoading(false);
+        }
+
+      };
+
+      fetchData();
+    } else {
+      setAccountAge(undefined);
+      setTotalTransactions(undefined);
+      setProtocolsInteracted(undefined);
+    }
+  }, [account?.address, connected]);
   useEffect(() => {
     if (connected) {
       setIsModalOpen(false);
@@ -561,7 +750,7 @@ const Home: React.FC = () => {
   };
 
   const handleActionClick = (action: string) => {
-    setSelectedAction(action); // Update the selected action based on button click
+    setSelectedAction(action);
   };
 
   return (
@@ -588,10 +777,23 @@ const Home: React.FC = () => {
 
           <Grid item xs={12} md={9}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <OnChain />
+              <OnChain
+                transactions={Number(totalTransactions)}
+                age={accountAge!}
+                totalGas={protocolsInteracted?.totalGas!}
+                loading={loading}
+              />
               <ActionButtons onActionClick={handleActionClick} />
               {selectedAction === "Social Media" && <TaskList />}
-              {selectedAction === "On-chain activity" && <OnChain />}
+              {selectedAction === "On-chain activity" && (
+                <ChainData
+                  protocols={protocolsInteracted?.protocal!}
+                  totalGas={protocolsInteracted?.totalGas!}
+                  transactions={Number(totalTransactions)}
+                  age={accountAge!}
+                  isloading={loading}
+                />
+              )}
             </Box>
           </Grid>
         </Grid>
