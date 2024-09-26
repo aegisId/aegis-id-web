@@ -56,6 +56,7 @@ const WalletConnectionModal: React.FC<WalletConnectionModalProps> = ({
     return [otherWallets];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wallets]);
+
   const handleWalletConnect = (walletName: any) => {
     connect(walletName);
   };
@@ -87,11 +88,11 @@ const WalletConnectionModal: React.FC<WalletConnectionModalProps> = ({
           <Paper
             elevation={1}
             sx={{
-              width: { xs: "90%", sm: "424px" },
-              p: { xs: 2, sm: 4 },
+              width: { xs: "85%", sm: "380px" },
+              p: { xs: 2, sm: 3 },
               border: "1px solid #3a1e09",
               bgcolor: "white",
-              transition: "opacity 225ms cubic-bezier(0.4, 0, 0.2, 1)", // Apply to Paper as well
+              transition: "opacity 225ms cubic-bezier(0.4, 0, 0.2, 1)", 
             }}
           >
             <Box
@@ -106,7 +107,7 @@ const WalletConnectionModal: React.FC<WalletConnectionModalProps> = ({
                   fontFamily: "Manrope-Medium, Helvetica",
                   color: "#3a1e09",
                   fontWeight: "600",
-                  fontSize: { xs: "0.875rem", sm: "1rem" }, // Adjusted font size
+                  fontSize: { xs: "0.875rem", sm: "1rem" }, 
                 }}
               >
                 Connect Wallet
@@ -122,7 +123,7 @@ const WalletConnectionModal: React.FC<WalletConnectionModalProps> = ({
                 <CloseIcon />
               </IconButton>
             </Box>
-            <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Grid container spacing={1} sx={{ mt: 1 }}> {/* Reduced spacing */}
               {aptosdetected && aptosdetected.length > 0 ? (
                 aptosdetected.map((item: any, key: any) => (
                   <Grid
@@ -137,7 +138,7 @@ const WalletConnectionModal: React.FC<WalletConnectionModalProps> = ({
                       flexDirection="row"
                       justifyContent="space-between"
                       alignItems="center"
-                      p={{ xs: 1.5, sm: 2 }}
+                      p={1.5}  
                       sx={{
                         "&:hover": {
                           backgroundColor: "rgba(1,1,1,0.45)",
@@ -150,8 +151,8 @@ const WalletConnectionModal: React.FC<WalletConnectionModalProps> = ({
                           className="w-12 h-12"
                           src={item.icon}
                           alt={item.name}
-                          width={40}
-                          height={40}
+                          width={36}
+                          height={36}
                         />
                       )}
                       <Typography
@@ -190,7 +191,7 @@ const WalletConnectionModal: React.FC<WalletConnectionModalProps> = ({
                   <Typography
                     variant="body1"
                     sx={{
-                      py: 2,
+                      py: 1.5,
                       textAlign: "center",
                       color: "#FFFFFFCC",
                       fontWeight: "800",

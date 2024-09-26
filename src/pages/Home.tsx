@@ -178,10 +178,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onActionClick }) => {
     "On-chain activity",
   ];
 
-  const [selectedAction, setSelectedAction] = useState<string>(actions[0]); 
+  const [selectedAction, setSelectedAction] = useState<string>(actions[0]);
 
   const handleActionClick = (action: string) => {
-    setSelectedAction(action); 
+    setSelectedAction(action);
     onActionClick(action);
   };
 
@@ -190,7 +190,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onActionClick }) => {
       {actions.map((action) => (
         <Button
           key={action}
-          variant={selectedAction === action ? "contained" : "outlined"} 
+          variant={selectedAction === action ? "contained" : "outlined"}
           sx={{
             bgcolor: selectedAction === action ? "#3a1e09" : "transparent",
             borderColor: "#3a1e09",
@@ -208,16 +208,16 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onActionClick }) => {
 
 const TaskList = () => {
   const tasks = [
-    { name: "Connect with X", description: "Link your X account", points: 20 },
+    { name: "Connect with X", description: "Link your X account", points: 7 },
     {
       name: "Connect with Discord",
       description: "Link your Discord account",
-      points: 20,
+      points: 5,
     },
     {
-      name: "Complete Profile",
-      description: "Fill out your user profile",
-      points: 20,
+      name: "Connect with LinkedIn",
+      description: "Link your LinkedIn account",
+      points: 8,
     },
   ];
 
@@ -452,7 +452,7 @@ const Header: React.FC<HeaderProps> = ({
             <img
               alt="Wallet"
               src={wallet.icon}
-              style={{ maxHeight: 40, marginRight: 8 }}
+              style={{ maxHeight: 30, marginRight: 8 }}
             />
             <span>{shortenAddress(account.address)}</span>
           </>
@@ -465,17 +465,17 @@ const Header: React.FC<HeaderProps> = ({
 };
 
 interface OnChainProps {
-  transactions: number | null; 
-  age: Date | null; 
+  transactions: number | null;
+  age: Date | null;
   totalGas: number | null;
-  loading: boolean; 
+  loading: boolean;
 }
 
 const OnChain = ({
   transactions,
   age,
   totalGas,
-  loading, 
+  loading,
 }: OnChainProps): JSX.Element => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -539,37 +539,33 @@ const OnChain = ({
                           fontWeight: "bold",
                         }}
                       >
-                        {transactions
-                          ? transactions.toLocaleString()
-                          : "0"}
+                        {transactions ? transactions.toLocaleString() : "0"}
                       </Typography>
                     )}
                   </Box>
+                ) : loading ? (
+                  <Skeleton
+                    variant="text"
+                    width={isMobile ? 80 : 120}
+                    height={isMobile ? 40 : 60}
+                  />
                 ) : (
-                  loading ? (
-                    <Skeleton
-                      variant="text"
-                      width={isMobile ? 80 : 120}
-                      height={isMobile ? 40 : 60}
-                    />
-                  ) : (
-                    <Typography
-                      variant={isMobile ? "h5" : "h4"}
-                      color="#3a1e09"
-                      fontWeight="bold"
-                    >
-                      {index === 0
-                        ? age
-                          ? `${calculateAgeInDays(age)} Days`
-                          : "0"
-                        : totalGas
-                        ? totalGas
-                        : "0"}
-                    </Typography>
-                  )
+                  <Typography
+                    variant={isMobile ? "h5" : "h4"}
+                    color="#3a1e09"
+                    fontWeight="bold"
+                  >
+                    {index === 0
+                      ? age
+                        ? `${calculateAgeInDays(age)} Days`
+                        : "0"
+                      : totalGas
+                      ? totalGas
+                      : "0"}
+                  </Typography>
                 )}
-                
-                {index === 2 && totalGas && (
+
+                {index === 2 && totalGas ? (
                   <Typography
                     variant={isMobile ? "h5" : "h6"}
                     color="#3a1e09"
@@ -577,6 +573,8 @@ const OnChain = ({
                   >
                     APT
                   </Typography>
+                ) : (
+                  ""
                 )}
 
                 <Typography variant="subtitle1" color="#3a1e09" mt={1}>
@@ -626,27 +624,43 @@ const ChainData = ({
           title: "Protocols",
           value: isloading ? (
             <Skeleton variant="text" width={isMobile ? 100 : 150} />
-          ) : protocols ? `${protocols.kanalabs ?? 0} (Kanalabs), ${
+          ) : protocols ? (
+            `${protocols.kanalabs ?? 0} (Kanalabs), ${
               protocols.hippo ?? 0
-            } (Hippo)` : "N/A",
+            } (Hippo)`
+          ) : (
+            "N/A"
+          ),
         },
         {
           title: "Total Gas",
           value: isloading ? (
             <Skeleton variant="text" width={isMobile ? 50 : 100} />
-          ) : totalGas ? `${totalGas} APT` : "N/A",
+          ) : totalGas ? (
+            `${totalGas} APT`
+          ) : (
+            "N/A"
+          ),
         },
         {
           title: "Transactions",
           value: isloading ? (
             <Skeleton variant="text" width={isMobile ? 50 : 100} />
-          ) : transactions ? `${transactions}` : "N/A",
+          ) : transactions ? (
+            `${transactions}`
+          ) : (
+            "N/A"
+          ),
         },
         {
           title: "Account Age",
           value: isloading ? (
             <Skeleton variant="text" width={isMobile ? 100 : 150} />
-          ) : age ? age.toDateString() : "N/A",
+          ) : age ? (
+            age.toDateString()
+          ) : (
+            "N/A"
+          ),
         },
       ].map((item, index) => (
         <Grid item xs={12} sm={6} key={item.title}>
@@ -704,12 +718,12 @@ const Home: React.FC = () => {
   const [totalTransactions, setTotalTransactions] = useState<string>();
   const [protocolsInteracted, setProtocolsInteracted] =
     useState<ProtocolsInteractedResponse>();
-    const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (connected) {
       const fetchData = async () => {
-        setLoading(true); 
+        setLoading(true);
         try {
           const [age, transactions, protocols] = await Promise.all([
             getAccountAge(account?.address!),
@@ -722,10 +736,9 @@ const Home: React.FC = () => {
           setProtocolsInteracted(protocols!);
         } catch (error) {
           console.error("Error fetching data:", error);
-        }finally {
+        } finally {
           setLoading(false);
         }
-
       };
 
       fetchData();
@@ -734,7 +747,7 @@ const Home: React.FC = () => {
       setTotalTransactions(undefined);
       setProtocolsInteracted(undefined);
     }
-  }, [account?.address, connected]);
+  }, [account, account?.address, connected]);
   useEffect(() => {
     if (connected) {
       setIsModalOpen(false);
