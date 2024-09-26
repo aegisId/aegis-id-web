@@ -1,54 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 export const useTwitterAuth = () => {
-  const [userId, setUserId] = useState<string | null>(null);
-  const backendHost = "https://api.aegisid.io";
-
-  const missionEndpoints = {
-    twitterAuthlink: "/twitter/authlink",
-  }
-  const defaultCreds = {
-    oauthToken: "",
-    oauthVerifier: "",
-  };
-  const [twitterCreds, setTwitterCreds] = useState(defaultCreds);
-  console.log("🚀 ~ useTwitterAuth ~ twitterCreds:", twitterCreds)
-
-
+  const [userId, setUserId] = useState(null)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const code = urlParams.get('code')
+    
+    if (code) {
+      axios.get(`http://localhost:3006/twitter/callback?code=${code}`)
+        .then(response => {
+          setUserId(response.data.userId)
+        })
+        .catch(error => {
+          console.error('Error fetching user ID:', error)
+        })
+    }
+  }, [])
   const handleAuth = async () => {
-    setTwitterCreds(defaultCreds); // Reset tokens on every auth attempt
-    const authlinkEndpoint: URL = new URL(
-      missionEndpoints.twitterAuthlink,
-      backendHost
-    );
-    const api = axios.create({
-    baseURL: "https://api.aegisid.io",
-    withCredentials: true,
-  });
-
-    const response = await api.post(authlinkEndpoint.href).catch((err) => {});
-    if (response?.status === 200) {
-      const oauth_token =
-        new URL(response.data.authlink).searchParams.get("oauth_token") || "";
-      setTwitterCreds((prevCreds) => ({
-        ...prevCreds,
-        oauth_token,
-      }));
-      const twitterPopup = window.open(
-        response.data.authlink,
-        "twitterPopup",
-        "width=500"
-      );
-      window.onmessage = (ev) => {
-        if (ev.data.eventType === "twitter oauth") {
-          setTwitterCreds({
-            oauthToken: ev.data.oauth_token,
-            oauthVerifier: ev.data.oauth_verifier,
-          });
-          twitterPopup?.close();
-        }
-      };
+        try {
+      const response = await axios.get('http://localhost:3006/twitter/auth')
+      window.location.href = response.data.url
+    } catch (error) {
+      console.error('Error initiating login:', error)
     }
   };
   const disconnect = () => {
