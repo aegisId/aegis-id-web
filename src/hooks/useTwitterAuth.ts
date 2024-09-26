@@ -8,7 +8,7 @@ export const useTwitterAuth = () => {
     const code = urlParams.get('code')
     
     if (code) {
-      axios.get(`http://localhost:3006/twitter/callback?code=${code}`)
+      axios.get(`https://api.aegisid.io/twitter/callback?code=${code}`)
         .then(response => {
           setUserId(response.data.userId)
         })
@@ -19,7 +19,7 @@ export const useTwitterAuth = () => {
   }, [])
   const handleAuth = async () => {
         try {
-      const response = await axios.get('http://localhost:3006/twitter/auth')
+      const response = await axios.get('https://api.aegisid.io/twitter/auth')
       window.location.href = response.data.url
     } catch (error) {
       console.error('Error initiating login:', error)
