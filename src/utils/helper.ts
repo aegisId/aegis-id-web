@@ -34,15 +34,15 @@ export const getAccountAge = async (address: string) => {
 };
 
 
-export const getAccountName = async (address: string) => {
-  try {
-    const name = await aptos.getAccountNames({
-      accountAddress: "0x9f73f71584332614ea07a1d04b18b838cae48724d890404259d289ea0ccf1937",
-    });
-  } catch (error) {
-    console.error("Error fetching ANS name:", error);
-  }
-};
+// export const getAccountName = async (address: string) => {
+//   try {
+//     const name = await aptos.getAccountNames({
+//       accountAddress: "0x9f73f71584332614ea07a1d04b18b838cae48724d890404259d289ea0ccf1937",
+//     });
+//   } catch (error) {
+//     console.error("Error fetching ANS name:", error);
+//   }
+// };
 
 const protocolAddress = {
   kanalabs:
