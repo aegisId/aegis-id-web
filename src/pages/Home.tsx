@@ -223,6 +223,11 @@ const TaskList = () => {
   ];
 
   const { userId, handleAuth } = useTwitterAuth();
+  useEffect(() => {
+    if (userId) {
+      proveAndVerify(userId);
+    }
+  }, [userId]);
 
   const handleTaskClick = async (task: {
     name: any;
@@ -232,9 +237,6 @@ const TaskList = () => {
     if (task.name === "Connect with X") {
       if (!userId) {
         await handleAuth();
-      }
-      if (userId) {
-        proveAndVerify(userId);
       }
     }
   };
