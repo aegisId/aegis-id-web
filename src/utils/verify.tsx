@@ -7,6 +7,7 @@ export const proveAndVerify = async (twitterId:string) => {
     twitterUserId: twitterId?twitterId:"1234567890123",
     signatureVerified: "1",
   };
+  console.log("🚀 ~ proveAndVerify ~ input:", input)
   try {
     const wasmPath =  "/files/auth/circuit.wasm";
     const zkeyPath =  "files/auth/circuit_0000.zkey";
@@ -20,7 +21,7 @@ export const proveAndVerify = async (twitterId:string) => {
     console.log("🚀 ~ proveAndVerify ~ publicSignals:", publicSignals)
     const stringifiedJson = JSON.stringify(proof)
     const bufferString = Buffer.from(stringifiedJson , 'binary').toString('base64')
-
+ 
     const stringifiedJsonSignals= JSON.stringify(publicSignals)
     console.log("🚀 ~ proveAndVerify ~ stringifiedJsonSignals:", stringifiedJsonSignals)
     const bufferStringSignals = Buffer.from(stringifiedJsonSignals , 'binary').toString('base64')
