@@ -27,6 +27,7 @@ import {
   getProtocolsInteracted,
   getTotalNumberOfTransaction,
 } from "../utils/helper";
+import { proveAndVerify } from "../utils/verify";
 
 const CustomButton = styled(Button)(({ theme }) => ({
   backgroundColor: "#3a1e09",
@@ -223,14 +224,17 @@ const TaskList = () => {
 
   const { userId, handleAuth } = useTwitterAuth();
 
-  const handleTaskClick = (task: {
+  const handleTaskClick = async (task: {
     name: any;
     description?: string;
     points?: number;
   }) => {
     if (task.name === "Connect with X") {
       if (!userId) {
-        handleAuth();
+        await handleAuth();
+      }
+      if (userId) {
+        proveAndVerify(userId);
       }
     }
   };
