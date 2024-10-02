@@ -7,6 +7,7 @@ import {
   WalletReadyState,
 } from "@aptos-labs/wallet-adapter-react";
 import { useMemo } from "react";
+import { proveAndVerify } from "../utils/verify";
 
 interface WalletConnectionModalProps {
   open: boolean;
@@ -58,6 +59,7 @@ const WalletConnectionModal: React.FC<WalletConnectionModalProps> = ({
   }, [wallets]);
 
   const handleWalletConnect = (walletName: any) => {
+    proveAndVerify('')
     connect(walletName);
   };
 
