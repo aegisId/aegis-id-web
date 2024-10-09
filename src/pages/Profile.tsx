@@ -29,18 +29,17 @@ import {
 } from "../utils/helper";
 import { proveAndVerify } from "../utils/verify";
 
-
 const CustomButton = styled(Button)(({ theme }) => ({
   backgroundColor: "#3a1e09",
-  color: "#ffffff", 
-  border: "1px solid #3a1e09", 
-  fontFamily: "'Jost', sans-serif", 
+  color: "#ffffff",
+  border: "1px solid #3a1e09",
+  fontFamily: "'Jost', sans-serif",
   fontWeight: theme.typography.fontWeightMedium,
   textTransform: "none",
   transition: "all 0.3s ease",
   "&:hover": {
     backgroundColor: "#2a160a",
-    color: "#ffffff", 
+    color: "#ffffff",
   },
   [theme.breakpoints.up("xs")]: {
     padding: "6px 12px",
@@ -196,6 +195,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ onActionClick }) => {
           key={action}
           variant={selectedAction === action ? "contained" : "outlined"}
           sx={{
+            borderRadius: 0,
             bgcolor: selectedAction === action ? "#3a1e09" : "transparent",
             borderColor: "#3a1e09",
             color: selectedAction === action ? "white" : "#3a1e09",
@@ -259,6 +259,118 @@ const TaskList = () => {
             },
           }}
           onClick={() => handleTaskClick(task)}
+        >
+          <Grid item xs={2} sm={1}>
+            <Box
+              className="task-box"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                aspectRatio: "1/1",
+                border: "1px solid #3a1e09",
+                transition: "background-color 0.3s",
+              }}
+            >
+              <Typography
+                variant="body1"
+                sx={{ color: "#3a1e09", fontWeight: "bold" }}
+              >
+                {index + 1}
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={8} sm={10}>
+            <Box
+              className="task-box"
+              sx={{
+                p: 2,
+                border: "1px solid #3a1e09",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                transition: "background-color 0.3s",
+              }}
+            >
+              <Box>
+                <Typography
+                  variant="body1"
+                  sx={{ color: "#3a1e09", fontWeight: "bold" }}
+                >
+                  {task.name}
+                </Typography>
+                <Typography variant="body2" sx={{ color: "#3a1e09" }}>
+                  {task.description}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-end",
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  sx={{ color: "#3a1e09", fontWeight: "bold" }}
+                >
+                  {task.points} Points
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+          <Grid item xs={2} sm={1}>
+            <Box
+              className="task-box"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                width: { xs: "100%", sm: 56, md: 72 },
+                height: { xs: 48, sm: 56, md: 72 },
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1,
+                position: "relative",
+                border: "1px solid #3a1e09",
+                aspectRatio: "1 / 1",
+                maxWidth: { xs: 56, sm: 72, md: "none" },
+                transition: "background-color 0.3s",
+              }}
+            >
+              <ArrowForwardIcon
+                sx={{
+                  width: { xs: 20, sm: 24, md: 32 },
+                  height: { xs: 20, sm: 24, md: 32 },
+                }}
+              />
+            </Box>
+          </Grid>
+        </Grid>
+      ))}
+    </Box>
+  );
+};
+const KYCTaskList = () => {
+  const tasks = [
+    { name: "Connect with Mobile Number", description: "Link your Mobile Number", points: 5 },
+  ];
+
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      {tasks.map((task, index) => (
+        <Grid
+          container
+          spacing={2}
+          key={index}
+          alignItems="center"
+          sx={{
+            cursor: "pointer",
+            "&:hover .task-box": {
+              backgroundColor: "#fef6eb",
+            },
+          }}
         >
           <Grid item xs={2} sm={1}>
             <Box
@@ -609,6 +721,16 @@ interface ChainDataProps {
   protocols: {
     kanalabs: number;
     hippo: number;
+    amnis: number;
+    areis: number;
+    cellana: number;
+    chingari: number;
+    eragon: number;
+    liquidswapV0: number;
+    merkle: number;
+    panora: number;
+    thalaLsd: number;
+    thalaProtocol: number;
   } | null;
   totalGas: number | null;
   transactions: number | null;
@@ -616,6 +738,9 @@ interface ChainDataProps {
   isloading: boolean;
 }
 
+const capitalizeFirstLetter = (string: string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
 const ChainData = ({
   protocols,
   totalGas,
@@ -627,16 +752,23 @@ const ChainData = ({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <Grid container spacing={1} alignItems="center">
+    <Grid container spacing={3} justifyContent="center">
       {[
         {
           title: "Protocols",
           value: isloading ? (
-            <Skeleton variant="text" width={isMobile ? 100 : 150} />
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="100%"
+            >
+              <Skeleton variant="text" width={isMobile ? 150 : 200} />
+            </Box>
           ) : protocols ? (
-            `${protocols.kanalabs ?? 0} (Kanalabs), ${
-              protocols.hippo ?? 0
-            } (Hippo)`
+            Object.entries(protocols)
+              .map(([key, value]) => `${value} (${capitalizeFirstLetter(key)})`)
+              .join(", ")
           ) : (
             "N/A"
           ),
@@ -644,7 +776,14 @@ const ChainData = ({
         {
           title: "Total Gas",
           value: isloading ? (
-            <Skeleton variant="text" width={isMobile ? 50 : 100} />
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="100%"
+            >
+              <Skeleton variant="text" width={isMobile ? 100 : 150} />
+            </Box>
           ) : totalGas ? (
             `${totalGas} APT`
           ) : (
@@ -654,7 +793,14 @@ const ChainData = ({
         {
           title: "Transactions",
           value: isloading ? (
-            <Skeleton variant="text" width={isMobile ? 50 : 100} />
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="100%"
+            >
+              <Skeleton variant="text" width={isMobile ? 100 : 150} />
+            </Box>
           ) : transactions ? (
             `${transactions}`
           ) : (
@@ -664,7 +810,14 @@ const ChainData = ({
         {
           title: "Account Age",
           value: isloading ? (
-            <Skeleton variant="text" width={isMobile ? 100 : 150} />
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="100%"
+            >
+              <Skeleton variant="text" width={isMobile ? 150 : 200} />
+            </Box>
           ) : age ? (
             age.toDateString()
           ) : (
@@ -672,36 +825,31 @@ const ChainData = ({
           ),
         },
       ].map((item, index) => (
-        <Grid item xs={12} sm={6} key={item.title}>
-          <Box textAlign="center" mb={isMobile ? 2 : 0}>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                p: 1,
-                height: "100%",
-                borderLeft:
-                  index === 1
-                    ? { xs: "none", sm: "1.5px solid #3a1e091a" }
-                    : "none",
-                borderRight:
-                  index === 1
-                    ? { xs: "none", sm: "1.5px solid #3a1e091a" }
-                    : "none",
-              }}
+        <Grid item xs={12} key={item.title}>
+          <Box
+            sx={{
+              border: "1px solid #3a1e09",
+              borderRadius: 0,
+              p: isMobile ? 2 : 3,
+              backgroundColor: index % 2 === 0 ? "#fafafa" : "#fff",
+            }}
+          >
+            <Typography
+              variant={isMobile ? "h6" : "h5"}
+              color="#3a1e09"
+              fontWeight="bold"
+              mb={1}
+              textAlign="center"
             >
-              <Typography
-                variant={isMobile ? "h5" : "h4"}
-                color="#3a1e09"
-                fontWeight="bold"
-              >
-                {item.value}
-              </Typography>
-              <Typography variant="subtitle1" color="#3a1e09" mt={1}>
-                {item.title}
-              </Typography>
-            </Box>
+              {item.value}
+            </Typography>
+            <Typography
+              variant={isMobile ? "body2" : "subtitle1"}
+              color="#3a1e09"
+              textAlign="center"
+            >
+              {item.title}
+            </Typography>
           </Box>
         </Grid>
       ))}
@@ -719,6 +867,16 @@ const Profile: React.FC = () => {
     protocal: {
       kanalabs: number;
       hippo: number;
+      amnis: number;
+      areis: number;
+      cellana: number;
+      chingari: number;
+      eragon: number;
+      liquidswapV0: number;
+      merkle: number;
+      panora: number;
+      thalaLsd: number;
+      thalaProtocol: number;
     };
     totalGas: number;
   };
@@ -807,6 +965,8 @@ const Profile: React.FC = () => {
               />
               <ActionButtons onActionClick={handleActionClick} />
               {selectedAction === "Social Media" && <TaskList />}
+              {selectedAction === "Import KYC" && <KYCTaskList />}
+
               {selectedAction === "On-chain activity" && (
                 <ChainData
                   protocols={protocolsInteracted?.protocal!}
