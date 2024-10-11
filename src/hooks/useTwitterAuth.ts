@@ -21,7 +21,7 @@ export const useTwitterAuth = () => {
           console.error('Error fetching user ID:', error)
         })
     }
-  }, [navigate])
+  }, [])
   const handleAuth = async () => {
         try {
       const response = await axios.get('https://api.aegisid.io/twitter/auth')
