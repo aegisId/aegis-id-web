@@ -21,6 +21,7 @@ export const useTwitterAuth = () => {
           console.error('Error fetching user ID:', error)
         })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const handleAuth = async () => {
         try {
