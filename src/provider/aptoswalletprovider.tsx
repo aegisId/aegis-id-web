@@ -5,12 +5,10 @@ import { MartianWallet } from "@martianwallet/aptos-wallet-adapter";
 import { PontemWallet } from "@pontem/wallet-adapter-plugin";
 import { FewchaWallet } from "fewcha-plugin-wallet-adapter";
 import { PropsWithChildren } from "react";
-// import { useAutoConnect } from "./AutoConnectProvider";
-// import { useToast } from "./ui/use-toast";
+import useNotification from '../hooks/useNotification';
 
 export const WalletProvider = ({ children }: PropsWithChildren) => {
-  // const { autoConnect } = useAutoConnect();
-//   const { toast } = useToast();
+  const {  showError, NotificationComponent } = useNotification();
 
   const wallets = [
     new FewchaWallet(),
@@ -19,13 +17,17 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
   ];
 
   return (
+    <>
+    {NotificationComponent}
     <AptosWalletAdapterProvider
       plugins={wallets}
       onError={(error) => {
-        console.log("🚀 ~ WalletProvider ~ error:", error)
+        showError(error)
       }}
     >
       {children}
     </AptosWalletAdapterProvider>
+    </>
   );
+
 };
