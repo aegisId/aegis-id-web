@@ -432,6 +432,7 @@ export const LandingPage: React.FC = () => {
                 flexWrap: "wrap",
               }}
             >
+              <Link href="/profile" underline="none">
               <Button
                 variant="outlined"
                 color="primary"
@@ -443,6 +444,8 @@ export const LandingPage: React.FC = () => {
               >
                 Prove your humanity
               </Button>
+              </Link>
+              <Link href="/api" underline="none">
               <Button
                 variant="outlined"
                 color="primary"
@@ -454,6 +457,7 @@ export const LandingPage: React.FC = () => {
               >
                 Build with our APIs
               </Button>
+              </Link>
             </Box>
             <Box
               component="img"

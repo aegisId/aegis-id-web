@@ -8,10 +8,12 @@ export const useTwitterAuth = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     const code = urlParams.get('code')
-    
+    console.log("🚀 ~code:", code)
+  
     if (code) {
       axios.get(`https://api.aegisid.io/twitter/callback?code=${code}`)
         .then(response => {
+          console.log("response.data.userId",response.data.userId)
           setUserId(response.data.userId)
           navigate('/profile');
         })
