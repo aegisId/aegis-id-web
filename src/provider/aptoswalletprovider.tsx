@@ -1,5 +1,3 @@
-"use client";
-
 import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react";
 import { MartianWallet } from "@martianwallet/aptos-wallet-adapter";
 import { PontemWallet } from "@pontem/wallet-adapter-plugin";
@@ -21,6 +19,7 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
     {NotificationComponent}
     <AptosWalletAdapterProvider
       plugins={wallets}
+      autoConnect={true}
       onError={(error) => {
         showError(error)
       }}

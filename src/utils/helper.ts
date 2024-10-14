@@ -1,14 +1,18 @@
 import {
   AccountAddress,
+  AccountAuthenticator,
   Aptos,
   AptosConfig,
+  Deserializer,
   Network,
   NetworkToNetworkName,
   UserTransactionResponse,
 } from "@aptos-labs/ts-sdk";
+import { AccountInfo } from "@aptos-labs/wallet-adapter-react";
+import axios from "axios";
 
+export const BACKEND = "https://api.aegisid.io";
 const APTOS_NETWORK: Network = NetworkToNetworkName[Network.MAINNET];
-
 const config = new AptosConfig({
   network: APTOS_NETWORK,
   fullnode: "https://api.mainnet.aptoslabs.com/v1",
@@ -75,7 +79,7 @@ export const getProtocolsInteracted = async (address: string) => {
     merkle: 0,
     panora: 0,
     thalaLsd: 0,
-    thalaProtocol: 0
+    thalaProtocol: 0,
   };
 
   let totalGas = 0;
@@ -121,7 +125,7 @@ export const getProtocolsInteracted = async (address: string) => {
         totakInteracted.thalaLsd = totakInteracted.thalaLsd + 1;
       } else if (moduleAddres === protocolAddress.thalaProtocol) {
         totakInteracted.thalaProtocol = totakInteracted.thalaProtocol + 1;
-      } 
+      }
     });
 
     totalNumberOfTransaction = totalNumberOfTransaction - 100;
@@ -134,3 +138,86 @@ export const getProtocolsInteracted = async (address: string) => {
     totalGas: totalGas / 10000000,
   };
 };
+
+export const getMultiSign = async (
+  account: AccountInfo | null,
+  signTransaction: any
+) => {
+  const config = new AptosConfig({ network: Network.DEVNET });
+  const aptos = new Aptos(config);
+  const transaction = await aptos.transaction.build.multiAgent({
+    sender: account?.address!,
+    secondarySignerAddresses: [
+      "6ca27696c78c7472918773fc2d893407d9590bdc707c56954bbc33ad0b0b0bfc",
+    ],
+    data: {
+      function:
+        "0x6ca27696c78c7472918773fc2d893407d9590bdc707c56954bbc33ad0b0b0bfc::aegis::add_twitter",
+      functionArguments: [],
+    },
+  });
+
+  const rawTransactionBytes = transaction.rawTransaction.bcsToBytes();
+  const requestBody: { data: Uint8Array } = { data: rawTransactionBytes };
+  const headers = {
+    "Content-Type": "application/json",
+  };
+  const response = await fetch(`${BACKEND}/sign`, {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify(requestBody),
+  });
+  if (response.status >= 400) {
+    await response.json().then((data) => {
+      throw new Error(
+        data?.error || data?.message || "Error in sponsoring transaction."
+      );
+    });
+  }
+  const responseData = await response.json();
+  const aegisAuth = new Uint8Array(Object.values(responseData.aegisAuth));
+  const deserializerAegis = new Deserializer(aegisAuth);
+  const aegisSignature = AccountAuthenticator.deserialize(deserializerAegis);
+  const aliceSignature = await signTransaction(transaction);
+
+  const pendingTransferTxn = await aptos.transaction.submit.multiAgent({
+    transaction: transaction,
+    senderAuthenticator: aliceSignature,
+    additionalSignersAuthenticators: [aegisSignature],
+  });
+
+  const txnreceipt = (await aptos.waitForTransaction({
+    transactionHash: pendingTransferTxn.hash,
+    options: { checkSuccess: true },
+  })) as UserTransactionResponse;
+  return txnreceipt.success;
+};
+
+export async function sendOTP(phoneNumber: string): Promise<boolean> {
+  try {
+    const response = await axios.get(`${BACKEND}/mobile/send`, {
+      params: { phoneNumber },
+    });
+    return response.data.success === true;
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    return false;
+  }
+}
+
+export async function verifyOTP(
+  phoneNumber: string,
+  otp: string
+): Promise<boolean> {
+  try {
+    const response = await axios.get(`${BACKEND}/mobile/verify`, {
+      params: { phoneNumber, otp },
+    });
+    return (
+      response.data.success === true && response.data.message === "OTP verified"
+    );
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    return false;
+  }
+}
