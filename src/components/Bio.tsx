@@ -1,14 +1,20 @@
 import { Box, Grid, Typography } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { useState } from "react";
+import Frame from "./Frame";
 
-export const ImportKyc = () => {
+export const Bio = () => {
   const tasks = [
     {
-      name: "Connect with Binance KYC",
-      description: "Link your Binance KYC",
-      points: 6,
+      name: "Connect with Mobile Number",
+      description: "Link your Mobile Number",
+      points: 5,
     },
   ];
+  const [isKycOpen, setKycOpen] = useState(false);
+
+  const openKycModal = () => setKycOpen(true);
+  const closeKycModal = () => setKycOpen(false);
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {tasks.map((task, index) => (
@@ -23,7 +29,7 @@ export const ImportKyc = () => {
               backgroundColor: "#fef6eb",
             },
           }}
-          // onClick={openKycModal}
+          onClick={openKycModal}
         >
           <Grid item xs={2} sm={1}>
             <Box
@@ -111,6 +117,8 @@ export const ImportKyc = () => {
           </Grid>
         </Grid>
       ))}
+
+      <Frame open={isKycOpen} onClose={closeKycModal} />
     </Box>
   );
 };

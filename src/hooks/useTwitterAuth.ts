@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { BACKEND } from '../utils/helper';
 
 export const useTwitterAuth = () => {
   const [userId, setUserId] = useState(null)
+  const [twitterLoading, setTwitterLoading] = useState(false)
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
-    const code = urlParams.get('code')
-    console.log("🚀 ~code:", code)
-  
+    const code = urlParams.get('code')  
     if (code) {
-      axios.get(`https://api.aegisid.io/twitter/callback?code=${code}`)
+      axios.get(`${BACKEND}/twitter/callback?code=${code}`)
         .then(response => {
-          console.log("response.data.userId",response.data.userId)
           setUserId(response.data.userId)
+          setTwitterLoading(true)
           window.history.replaceState({}, document.title, window.location.pathname);
         })
         .catch(error => {
@@ -23,7 +24,7 @@ export const useTwitterAuth = () => {
   }, [])
   const handleAuth = async () => {
         try {
-      const response = await axios.get('https://api.aegisid.io/twitter/auth')
+      const response = await axios.get(`${BACKEND}/twitter/auth`)
       window.location.href = response.data.url
     } catch (error) {
       console.error('Error initiating login:', error)
@@ -33,5 +34,5 @@ export const useTwitterAuth = () => {
     setUserId(null);
   };
 
-  return { userId, handleAuth, disconnect };
+  return { userId, twitterLoading, handleAuth, disconnect };
 };
