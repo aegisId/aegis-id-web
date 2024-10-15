@@ -1,9 +1,23 @@
 import { Box, Grid, Typography } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { useState } from "react";
-import Frame from "./Frame";
+import { useEffect, useState } from "react";
+import { Frame } from "./Frame";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle"; // Import tick icon
 
-export const Bio = () => {
+interface BioProps {
+  score: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export const Bio: React.FC<BioProps> = ({ score }) => {
+  const [mobileVerifed, setMobileVerifed] = useState(false);
+  console.log("🚀 ~ Bio ~ mobileVerifed:", mobileVerifed)
+  useEffect(() => {
+    if(mobileVerifed){
+      setKycOpen(false)
+      score(5)
+    }
+
+  }, [mobileVerifed])
   const tasks = [
     {
       name: "Connect with Mobile Number",
@@ -86,8 +100,8 @@ export const Bio = () => {
                   variant="body1"
                   sx={{ color: "#3a1e09", fontWeight: "bold" }}
                 >
-                  {task.points} Points
-                </Typography>
+                    {mobileVerifed && task.name === "Connect with Mobile Number" ? "Verified" : `${task.points} Points`}
+                    </Typography>
               </Box>
             </Box>
           </Grid>
@@ -107,18 +121,27 @@ export const Bio = () => {
                 transition: "background-color 0.3s",
               }}
             >
-              <ArrowForwardIcon
-                sx={{
-                  width: { xs: 20, sm: 24, md: 32 },
-                  height: { xs: 20, sm: 24, md: 32 },
-                }}
-              />
+                {mobileVerifed && task.name === "Connect with Mobile Number" ? (
+                  <CheckCircleIcon
+                    sx={{
+                      width: { xs: 20, sm: 24, md: 32 },
+                      height: { xs: 20, sm: 24, md: 32 },
+                    }}
+                  />
+                ) : (
+                  <ArrowForwardIcon
+                    sx={{
+                      width: { xs: 20, sm: 24, md: 32 },
+                      height: { xs: 20, sm: 24, md: 32 },
+                    }}
+                  />
+                )}
             </Box>
           </Grid>
         </Grid>
       ))}
 
-      <Frame open={isKycOpen} onClose={closeKycModal} />
+      {<Frame open={isKycOpen} onClose={closeKycModal} setMobileVerifed={setMobileVerifed} />}
     </Box>
   );
 };

@@ -190,7 +190,7 @@ export const getMultiSign = async (
     transactionHash: pendingTransferTxn.hash,
     options: { checkSuccess: true },
   })) as UserTransactionResponse;
-  return txnreceipt.success;
+  return {success:txnreceipt.success,hash:txnreceipt.version};
 };
 
 export async function sendOTP(phoneNumber: string): Promise<boolean> {

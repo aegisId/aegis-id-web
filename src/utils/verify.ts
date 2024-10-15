@@ -21,22 +21,36 @@ export const proveAndVerify = async (
       zkeyPath
     );
     const stringifiedJson = JSON.stringify(proof);
-    const bufferString = Buffer.from(stringifiedJson, "binary").toString("base64");
-    console.log("🚀 ~ bufferString:", bufferString)
+    const bufferString = Buffer.from(stringifiedJson, "binary").toString(
+      "base64"
+    );
+    console.log("🚀 ~ bufferString:", bufferString);
     const stringifiedJsonSignals = JSON.stringify(publicSignals);
-    const bufferStringSignals = Buffer.from(stringifiedJsonSignals, "binary").toString("base64");
-    console.log("🚀 ~ bufferStringSignals:", bufferStringSignals)
+    const bufferStringSignals = Buffer.from(
+      stringifiedJsonSignals,
+      "binary"
+    ).toString("base64");
+    console.log("🚀 ~ bufferStringSignals:", bufferStringSignals);
     const data = await axios.get(
       `${BACKEND}/verify?proof=${bufferString}&publicSignals=${bufferStringSignals}`
     );
-    console.log("🚀 ~ data:", data)
-    if(data){
+    console.log("🚀 ~ data:", data);
+    if (data) {
       const signdata = await getMultiSign(account, signTransaction);
+      return {
+        success: signdata.success,
+        hash: signdata.hash,
+      };
       return signdata;
     }
-    return false;
+    return {
+      success: false,
+      hash: "null",
+    };
   } catch (error: any) {
     console.error("Error in proveAndVerify:", error.message || error);
-    throw new Error("Verification failed due to an error. Please try again later.");
+    throw new Error(
+      "Verification failed due to an error. Please try again later."
+    );
   }
 };

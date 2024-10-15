@@ -15,7 +15,14 @@ import { Bio } from "../components/Bio";
 import { ImportKyc } from "../components/importKyc";
 import { Social } from "../components/Social";
 
-const ProfileSection = () => {
+interface Profile {
+  score: number;
+}
+const ProfileSection = ({
+  score,
+}: Profile): JSX.Element => {
+// const ProfileSection = () => {
+
   const { connected } = useWallet();
 
   return (
@@ -64,7 +71,7 @@ const ProfileSection = () => {
               lineHeight: 1,
             }}
           >
-            0
+            {score}
           </Typography>
           <Typography
             sx={{
@@ -158,6 +165,7 @@ const Profile: React.FC = () => {
     };
     totalGas: number;
   };
+  const [score, setScore] = useState(0);
 
   const [accountAge, setAccountAge] = useState<Date>();
   const [totalTransactions, setTotalTransactions] = useState<string>();
@@ -230,7 +238,7 @@ const Profile: React.FC = () => {
 
         <Grid container spacing={4} sx={{ my: 4 }}>
           <Grid item xs={12} md={3}>
-            <ProfileSection />
+            <ProfileSection score={score} />
           </Grid>
 
           <Grid item xs={12} md={9}>
@@ -242,8 +250,8 @@ const Profile: React.FC = () => {
                 loading={loading}
               />
               <ActionButtons onActionClick={handleActionClick} />
-              {selectedAction === "Social Media" && <Social />}
-              {selectedAction === "Biometrics and Liveliness" && <Bio />}
+              {selectedAction === "Social Media" && <Social score={setScore}/>}
+              {selectedAction === "Biometrics and Liveliness" && <Bio score={setScore} />}
               {selectedAction === "Import KYC" && <ImportKyc />}
               {selectedAction === "On-chain activity" && (
                 <ChainData
@@ -265,4 +273,3 @@ const Profile: React.FC = () => {
 };
 
 export default Profile;
-
