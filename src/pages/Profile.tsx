@@ -178,16 +178,15 @@ const Profile: React.FC = () => {
       if (protocolsInteracted?.protocal && Object.keys(protocolsInteracted?.protocal).length > 0) {
         totalScore += 5; 
       }
-      if (protocolsInteracted?.totalGas !== null) {
+      if (protocolsInteracted?.totalGas !== undefined) {
         totalScore += 3; 
       }
-      if (totalTransactions !== null) {
+      if (totalTransactions !== undefined) {
         totalScore += 3;
       }
       if (accountAge) {
         totalScore += 8;
       }
-
       setScore(totalScore);
     }
   }, [loading, protocolsInteracted?.protocal, protocolsInteracted?.totalGas, totalTransactions, accountAge, setScore]);
