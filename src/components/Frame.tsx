@@ -11,8 +11,6 @@ interface FrameProps {
 export const Frame: React.FC<FrameProps> = ({ open, onClose,setMobileVerifed }) => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [otpVisible, setOtpVisible] = useState(false);
-  // console.log("mobileVerifed:", mobileVerifed)
-
   const [otp, setOtp] = useState("");
   const [isOtpValid, setIsOtpValid] = useState(false);
 
@@ -33,7 +31,7 @@ export const Frame: React.FC<FrameProps> = ({ open, onClose,setMobileVerifed }) 
 
   const handleSubmit = async () => {
     if (mobileNumber.length === 10) {
-      let data = await sendOTP(mobileNumber);
+      const data = await sendOTP(mobileNumber);
       if (data) {
         setOtpVisible(true);
       }

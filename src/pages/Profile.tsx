@@ -252,7 +252,7 @@ const Profile: React.FC = () => {
               <ActionButtons onActionClick={handleActionClick} />
               {selectedAction === "Social Media" && <Social score={setScore}/>}
               {selectedAction === "Biometrics and Liveliness" && <Bio score={setScore} />}
-              {selectedAction === "Import KYC" && <ImportKyc />}
+              {selectedAction === "Import KYC" && <ImportKyc score={setScore}/>}
               {selectedAction === "On-chain activity" && (
                 <ChainData
                   protocols={protocolsInteracted?.protocal!}

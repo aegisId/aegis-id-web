@@ -1,7 +1,22 @@
 import { Box, Grid, Typography } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { useEffect, useState } from "react";
+import { BinanceFrame } from "./BinanceKyc";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle"; // Import tick icon
 
-export const ImportKyc = () => {
+interface ImportKyc {
+  score: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export const ImportKyc: React.FC<ImportKyc> = ({ score }) => {
+  const [binanceVerifed, setBinanceVerifed] = useState(false);
+  useEffect(() => {
+    if(binanceVerifed){
+      setKycOpen(false)
+      score(6)
+    }
+
+  }, [binanceVerifed])
   const tasks = [
     {
       name: "Connect with Binance KYC",
@@ -9,6 +24,9 @@ export const ImportKyc = () => {
       points: 6,
     },
   ];
+  const [isKycOpen, setKycOpen] = useState(false);
+  const openKycModal = () => setKycOpen(true);
+  const closeKycModal = () => setKycOpen(false);
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {tasks.map((task, index) => (
@@ -23,7 +41,7 @@ export const ImportKyc = () => {
               backgroundColor: "#fef6eb",
             },
           }}
-          // onClick={openKycModal}
+          onClick={openKycModal}
         >
           <Grid item xs={2} sm={1}>
             <Box
@@ -80,8 +98,8 @@ export const ImportKyc = () => {
                   variant="body1"
                   sx={{ color: "#3a1e09", fontWeight: "bold" }}
                 >
-                  {task.points} Points
-                </Typography>
+                    {binanceVerifed && task.name === "Connect with Binance KYC" ? "Verified" : `${task.points} Points`}
+                    </Typography>
               </Box>
             </Box>
           </Grid>
@@ -101,16 +119,27 @@ export const ImportKyc = () => {
                 transition: "background-color 0.3s",
               }}
             >
-              <ArrowForwardIcon
-                sx={{
-                  width: { xs: 20, sm: 24, md: 32 },
-                  height: { xs: 20, sm: 24, md: 32 },
-                }}
-              />
+               {binanceVerifed && task.name === "Connect with Binance KYC" ? (
+                  <CheckCircleIcon
+                    sx={{
+                      width: { xs: 20, sm: 24, md: 32 },
+                      height: { xs: 20, sm: 24, md: 32 },
+                    }}
+                  />
+                ) : (
+                  <ArrowForwardIcon
+                    sx={{
+                      width: { xs: 20, sm: 24, md: 32 },
+                      height: { xs: 20, sm: 24, md: 32 },
+                    }}
+                  />
+                )}
             </Box>
           </Grid>
         </Grid>
       ))}
+            {<BinanceFrame open={isKycOpen} onClose={closeKycModal} setBinanceVerifed={setBinanceVerifed}/>}
+
     </Box>
   );
 };
