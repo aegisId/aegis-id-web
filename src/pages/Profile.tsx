@@ -172,7 +172,25 @@ const Profile: React.FC = () => {
   const [protocolsInteracted, setProtocolsInteracted] =
     useState<ProtocolsInteractedResponse>();
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (!loading) {
+      let totalScore = 0;
+      if (protocolsInteracted?.protocal && Object.keys(protocolsInteracted?.protocal).length > 0) {
+        totalScore += 5; 
+      }
+      if (protocolsInteracted?.totalGas !== null) {
+        totalScore += 3; 
+      }
+      if (totalTransactions !== null) {
+        totalScore += 3;
+      }
+      if (accountAge) {
+        totalScore += 8;
+      }
 
+      setScore(totalScore);
+    }
+  }, [loading, protocolsInteracted?.protocal, protocolsInteracted?.totalGas, totalTransactions, accountAge, setScore]);
   useEffect(() => {
     if (connected) {
       const fetchData = async () => {
@@ -260,6 +278,7 @@ const Profile: React.FC = () => {
                   transactions={Number(totalTransactions)}
                   age={accountAge!}
                   isloading={loading}
+                  score={setScore}
                 />
               )}
             </Box>
