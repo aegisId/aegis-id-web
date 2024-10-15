@@ -143,7 +143,7 @@ export const getMultiSign = async (
   account: AccountInfo | null,
   signTransaction: any
 ) => {
-  const config = new AptosConfig({ network: Network.DEVNET });
+  const config = new AptosConfig({ network: Network.TESTNET });
   const aptos = new Aptos(config);
   const transaction = await aptos.transaction.build.multiAgent({
     sender: account?.address!,
