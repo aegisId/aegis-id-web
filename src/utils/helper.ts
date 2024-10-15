@@ -11,7 +11,7 @@ import {
 import { AccountInfo } from "@aptos-labs/wallet-adapter-react";
 import axios from "axios";
 
-export const BACKEND = "https://api.aegisid.io";
+export const BACKEND = "http://localhost:3006";
 const APTOS_NETWORK: Network = NetworkToNetworkName[Network.MAINNET];
 const config = new AptosConfig({
   network: APTOS_NETWORK,
