@@ -221,3 +221,21 @@ export async function verifyOTP(
     return false;
   }
 }
+
+
+export async function verifyBinance(
+  address: string
+): Promise<boolean> {
+  try {
+    const response = await axios.get(`${BACKEND}/user/verifyKycFromBinance`, {
+      params: { address},
+    });
+    console.log("🚀 ~ response:", response)
+    return (
+      response.data.verified === true
+    );
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    return false;
+  }
+}

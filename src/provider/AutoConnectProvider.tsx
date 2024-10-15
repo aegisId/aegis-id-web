@@ -42,7 +42,11 @@ createAppKit({
   projectId,
   metadata,
   features: {
-    analytics: true // Optional - defaults to your Cloud configuration
+    analytics: true
+  },
+  themeVariables: {
+    '--w3m-border-radius-master': '0', 
+    '--w3m-accent': '#3a1e09',
   }
 })
 
