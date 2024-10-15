@@ -54,7 +54,6 @@ export const Frame: React.FC<FrameProps> = ({ open, onClose }) => {
       <Paper
         elevation={1}
         sx={{
-          width: "100%",
           maxWidth: "624px",
           p: { xs: 2, sm: 4 },
           border: "1px solid #3a1e09",
@@ -99,7 +98,7 @@ export const Frame: React.FC<FrameProps> = ({ open, onClose }) => {
         <Box
           display="flex"
           alignItems="center"
-          p={2}
+          p={1}
           width="100%"
           bgcolor="#f5860014"
           mt={2}

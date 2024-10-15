@@ -1,68 +1,55 @@
-"use client";
+import { createAppKit } from '@reown/appkit/react'
 
-import {
-  FC,
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { WagmiProvider } from 'wagmi'
+import { AppKitNetwork, arbitrum, mainnet } from '@reown/appkit/networks'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { ReactNode } from 'react'
 
-const AUTO_CONNECT_LOCAL_STORAGE_KEY = "AptosWalletAutoConnect";
-
-export interface AutoConnectContextState {
-  autoConnect: boolean;
-  setAutoConnect(autoConnect: boolean): void;
+interface AppKitProviderProps {
+  children: ReactNode
 }
 
-export const AutoConnectContext = createContext<AutoConnectContextState>(
-  {} as AutoConnectContextState,
-);
+// 0. Setup queryClient
+const queryClient = new QueryClient()
+;
 
-export function useAutoConnect(): AutoConnectContextState {
-  return useContext(AutoConnectContext);
+// 1. Get projectId from https://cloud.reown.com
+const projectId = import.meta.env.VITE_CONNECT_WALLET_ID
+
+// 2. Create a metadata object - optional
+const metadata = {
+  name: 'AppKit',
+  description: 'AppKit Example',
+  url: 'https://example.com', // origin must match your domain & subdomain
+  icons: ['https://avatars.githubusercontent.com/u/179229932']
 }
 
-export const AutoConnectProvider: FC<{ children: ReactNode }> = ({
-  children,
-}) => {
-  const [autoConnect, setAutoConnect] = useState(false);
+// 3. Set the networks
+const networks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet, arbitrum]
 
-  useEffect(() => {
-    // Wait until the app hydrates before populating `autoConnect` from local storage
-    try {
-      const isAutoConnect = localStorage.getItem(
-        AUTO_CONNECT_LOCAL_STORAGE_KEY,
-      );
-      if (isAutoConnect) return setAutoConnect(JSON.parse(isAutoConnect));
-    } catch (e) {
-      if (typeof window !== "undefined") {
-        console.error(e);
-      }
-    }
-  }, []);
+// 4. Create Wagmi Adapter
+const wagmiAdapter = new WagmiAdapter({
+  networks,
+  projectId,
+  ssr: true
+})
 
-  useEffect(() => {
-    try {
-      if (!autoConnect) {
-        localStorage.removeItem(AUTO_CONNECT_LOCAL_STORAGE_KEY);
-      } else {
-        localStorage.setItem(
-          AUTO_CONNECT_LOCAL_STORAGE_KEY,
-          JSON.stringify(autoConnect),
-        );
-      }
-    } catch (error: any) {
-      if (typeof window !== "undefined") {
-        console.error(error);
-      }
-    }
-  }, [autoConnect]);
+// 5. Create modal
+createAppKit({
+  adapters: [wagmiAdapter],
+  networks,
+  projectId,
+  metadata,
+  features: {
+    analytics: true // Optional - defaults to your Cloud configuration
+  }
+})
 
+export function AppKitProvider({ children }: AppKitProviderProps) {
   return (
-    <AutoConnectContext.Provider value={{ autoConnect, setAutoConnect }}>
-      {children}
-    </AutoConnectContext.Provider>
-  );
-};
+    <WagmiProvider config={wagmiAdapter.wagmiConfig}>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </WagmiProvider>
+  )
+}
