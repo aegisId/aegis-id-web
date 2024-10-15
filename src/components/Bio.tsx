@@ -10,7 +10,6 @@ interface BioProps {
 
 export const Bio: React.FC<BioProps> = ({ score }) => {
   const [mobileVerifed, setMobileVerifed] = useState(false);
-  console.log("🚀 ~ Bio ~ mobileVerifed:", mobileVerifed)
   useEffect(() => {
     if(mobileVerifed){
       setKycOpen(false)

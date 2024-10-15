@@ -230,7 +230,6 @@ export async function verifyBinance(
     const response = await axios.get(`${BACKEND}/user/verifyKycFromBinance`, {
       params: { address},
     });
-    console.log("🚀 ~ response:", response)
     return (
       response.data.verified === true
     );

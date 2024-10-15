@@ -24,17 +24,14 @@ export const proveAndVerify = async (
     const bufferString = Buffer.from(stringifiedJson, "binary").toString(
       "base64"
     );
-    console.log("🚀 ~ bufferString:", bufferString);
     const stringifiedJsonSignals = JSON.stringify(publicSignals);
     const bufferStringSignals = Buffer.from(
       stringifiedJsonSignals,
       "binary"
     ).toString("base64");
-    console.log("🚀 ~ bufferStringSignals:", bufferStringSignals);
     const data = await axios.get(
       `${BACKEND}/verify?proof=${bufferString}&publicSignals=${bufferStringSignals}`
     );
-    console.log("🚀 ~ data:", data);
     if (data) {
       const signdata = await getMultiSign(account, signTransaction);
       return {

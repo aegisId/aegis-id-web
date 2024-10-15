@@ -58,7 +58,6 @@ export const ChainData = ({
       score(totalScore);
     }
   }, [isloading, protocols, totalGas, transactions, age, score]);
-  console.log("🚀 ~ score:", score);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
