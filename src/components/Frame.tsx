@@ -6,13 +6,12 @@ import { sendOTP, verifyOTP } from "../utils/helper";
 interface FrameProps {
   open: boolean;
   onClose: () => void;
-}
+  setMobileVerifed: React.Dispatch<React.SetStateAction<boolean>>}
 
-export const Frame: React.FC<FrameProps> = ({ open, onClose }) => {
+export const Frame: React.FC<FrameProps> = ({ open, onClose,setMobileVerifed }) => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [otpVisible, setOtpVisible] = useState(false);
-  const [mobileVerifed, setMobileVerifed] = useState(false);
-  console.log("mobileVerifed:", mobileVerifed)
+  // console.log("mobileVerifed:", mobileVerifed)
 
   const [otp, setOtp] = useState("");
   const [isOtpValid, setIsOtpValid] = useState(false);
@@ -42,7 +41,7 @@ export const Frame: React.FC<FrameProps> = ({ open, onClose }) => {
   };
   const handleVerify = async () => {
     if (otp.length === 6 && mobileNumber.length === 10) {
-      let data = await verifyOTP(mobileNumber, otp);
+      const data = await verifyOTP(mobileNumber, otp);
       if (data) {
         setMobileVerifed(true);
       }
@@ -151,7 +150,7 @@ export const Frame: React.FC<FrameProps> = ({ open, onClose }) => {
           <Box
             display="flex"
             alignItems="center"
-            p={2}
+            p={1}
             width="100%"
             bgcolor="#f5860014"
             mt={2}
@@ -219,5 +218,3 @@ export const Frame: React.FC<FrameProps> = ({ open, onClose }) => {
     </Dialog>
   );
 };
-
-export default Frame;

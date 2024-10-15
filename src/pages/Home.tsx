@@ -47,6 +47,7 @@ interface Section {
   features: Feature[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface FeatureSectionProps extends Section {}
 
 const customTheme = createTheme({

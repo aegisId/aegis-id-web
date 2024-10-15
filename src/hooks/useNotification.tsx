@@ -3,7 +3,7 @@ import { Snackbar, Alert, AlertColor } from '@mui/material';
 
 interface NotificationProps {
   id: number; 
-  message: string;
+  message: React.ReactNode;
   severity: AlertColor;
 }
 
@@ -12,10 +12,25 @@ let idCounter = 0;
 const useNotification = () => {
   const [notifications, setNotifications] = useState<NotificationProps[]>([]);
 
-  const showNotification = useCallback((message: string, severity: AlertColor = 'info') => {
+  const showNotification = useCallback((message: React.ReactNode, severity: AlertColor = 'info') => {
     const newNotification = { id: idCounter++, message, severity };
     setNotifications((prev) => [...prev, newNotification]);
   }, []);
+
+  const showSuccessHash = useCallback((message: string, fullUrl: string) => {
+    const hash = fullUrl.split('/').pop()?.split('?')[0];
+    const explorerLink = (
+      <a href={fullUrl} target="_blank" rel="noopener noreferrer">
+        {hash}
+      </a>
+    );
+    showNotification(
+      <>
+        {message} {explorerLink}
+      </>
+      , 'success'
+    );
+  }, [showNotification]);
 
   const showSuccess = useCallback((message: string) => {
     showNotification(message, 'success');
@@ -60,6 +75,7 @@ const useNotification = () => {
     showError,
     showWarning,
     showInfo,
+    showSuccessHash,
     NotificationComponent,
   };
 };
